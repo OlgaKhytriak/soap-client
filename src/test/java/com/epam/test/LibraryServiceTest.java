@@ -10,141 +10,116 @@ import com.epam.web.service.impl.NewspaperService;
 import com.epam.web.service.impl.NewspaperServiceImplService;
 import org.testng.annotations.Test;
 
-
-
 public class LibraryServiceTest {
 	
-	private static NewspaperService SERVICE = new NewspaperServiceImplService().getNewspaperServiceImplPort();
+	private static NewspaperService newspaperService = new NewspaperServiceImplService().getNewspaperServiceImplPort();
 	
-	@Test
-	public void getAllNewsTest(){
-		NewspaperResponse response = SERVICE.getAllNews();
-		List<Object> allNews = response.getResult();
 
-		assertEquals(allNews.size(),10);
+	@Test
+	public void getAllTest(){
+		NewspaperResponse response = newspaperService.getAllNews();
+		List<Object> allNews = response.getResult();
+		//assertEquals(allNews.size(),10);
 
 		String actualStatus = response.getStatus().getMessage();
 		assertEquals(actualStatus,GET_ALL);
-		
 	}
-	
-
 	@Test
 	public void getNewsByIdTest(){
-		NewspaperResponse response = SERVICE.getNewsById(1);
+		NewspaperResponse response = newspaperService.getNewsById(1);
 		SingleNews expectedNews=new SingleNews(1, "Gold-medal", "Sport", "Gold medalist Abramenko carries Ukrainian flag at Winter Olympics 2018 closing ceremony", "https://24tv.ua");
 		SingleNews actualNews = (SingleNews) response.getResult().get(0);
-
 		assertEquals(actualNews,expectedNews);
 
 		String actualStatus = response.getStatus().getMessage();
 		assertEquals(actualStatus,GET_BY_ID);
 	}
-/*
+
 	@Test
-	public void getBookByIdFailureTest(){
-		LibraryWSResponse response = SERVICE.getBookById(-1);
-		Book actual = (Book) response.getResult();
-		
-		assertNull(actual);
-		
-		String expectedStatus = "There is no such book";
+	public void getNewsByIdNegativeTest(){
+		NewspaperResponse response = newspaperService.getNewsById(-1);
+		SingleNews actualNews = (SingleNews) response.getResult();
+
 		String actualStatus = response.getStatus().getMessage();
-		assertEquals(actualStatus,expectedStatus);
+		assertEquals(actualStatus,NO_SUCH_NEWS);
 	}
-	
+
 	@Test
-	public void getBookByNameSuccesTest(){
-		LibraryWSResponse response = SERVICE.getBookByName("Crystal Magic");
-		Book expected = new Book("Crystal Magic", "Madeline Freeman", "Fantasy",7);
-		Book actual = (Book) response.getResult().get(0);
-		
+	public void getNewsByTitleTest(){
+		NewspaperResponse response = newspaperService.getNewsByTitle("Box");
+		SingleNews expectedNews=new SingleNews(4, "Box", "Sport", "Ukrainian Artem Dalakian becomes new WBA flyweight champion", "https://zik.ua");
+		SingleNews actualNews = (SingleNews) response.getResult().get(0);
+		assertEquals(actualNews,expectedNews);
+
+		String actualStatus = response.getStatus().getMessage();
+		assertEquals(actualStatus,GET_BY_TITLE);
+	}
+
+	@Test
+	public void getNewsByTitleNegativeTest(){
+		NewspaperResponse response = newspaperService.getNewsByTitle("Som unknown title");
+		SingleNews actualNews = (SingleNews) response.getResult();
+		assertNull(actualNews);
+
+		String actualStatus = response.getStatus().getMessage();
+		assertEquals(actualStatus,NO_SUCH_NEWS);
+	}
+
+	@Test
+	public void addNewsTest(){
+		SingleNews newsToAdd=new SingleNews(457, "My news", "politics", "Ukrainian politics", "https://zik.ua");
+		NewspaperResponse response = newspaperService.addNews(newsToAdd);
+		SingleNews actual = (SingleNews) newspaperService.getNewsByTitle("My news").getResult().get(0);
 		assertNotNull(actual);
-		assertEquals(actual,expected);
-		
-		String expectedStatus = "Get book by name successfully";
+
 		String actualStatus = response.getStatus().getMessage();
-		assertEquals(actualStatus,expectedStatus);
+		assertEquals(actualStatus,ALREADY_EXIST);
+
 	}
-	
+
 	@Test
-	public void getBookByNameFailureTest(){
-		LibraryWSResponse response = SERVICE.getBookByName("___________________");
-		Book actual = (Book) response.getResult();
-		
-		assertNull(actual);
-		
-		String expectedStatus = "There is no such book";
+	public void addNewsNegativeTest(){
+		SingleNews newsToAdd=new SingleNews(4, "Box", "Sport", "Ukrainian Artem Dalakian becomes new WBA flyweight champion", "https://zik.ua");
+		NewspaperResponse response = newspaperService.addNews(newsToAdd);
+
 		String actualStatus = response.getStatus().getMessage();
-		assertEquals(actualStatus,expectedStatus);
+		assertEquals(actualStatus,ALREADY_EXIST);
 	}
-	
+
 	@Test
-	public void giveBackBookSuccesTest(){
-		Book giveBackBook = new Book("Give Back Book Name", "Give Back Book Author", "Fantasy",101);
-		LibraryWSResponse response = SERVICE.giveBackBook(giveBackBook);
-		
-		Book actual = (Book) SERVICE.getBookByName("Give Back Book Name").getResult().get(0);
-		
-		assertNotNull(actual);
-				
-		String expectedStatus = "Book added to the library successfully";
+	public void updateNewsTest(){
+		SingleNews newsToAdd=new SingleNews(3,"My news", "politics", "Ukrainian politics", "https://zik.ua");
+		SingleNews oldNews = (SingleNews) newspaperService.getNewsById(3).getResult().get(0);
+		NewspaperResponse response = newspaperService.updateNews(oldNews, newsToAdd);
+
+		SingleNews expectedNews = newsToAdd;
+		SingleNews actualNews = (SingleNews) newspaperService.getNewsByTitle("My news").getResult().get(0);
+		assertEquals(actualNews,expectedNews);
+
 		String actualStatus = response.getStatus().getMessage();
-		assertEquals(actualStatus,expectedStatus);
-		
-		SERVICE.deleteBook(101);
+		assertEquals(actualStatus,UPDATE);
 	}
-	
+
 	@Test
-	public void giveBackBookFailureTest(){
-		Book giveBackBook = new Book("And Then There Were None", "Agatha Christie", "Thriller",3);
-		LibraryWSResponse response = SERVICE.giveBackBook(giveBackBook);
-				
-		String expectedStatus = "This book exists already.";
+	public void updateNewsNegativeTest(){
+		SingleNews newsToAdd=new SingleNews(3,"My news", "politics", "Ukrainian politics", "https://zik.ua");
+		SingleNews oldNews = new SingleNews(3,"Wrong news", "wrong", "Ukrainian politics", "https://zik.ua");
+		NewspaperResponse response = newspaperService.updateNews(oldNews, newsToAdd);
+
 		String actualStatus = response.getStatus().getMessage();
-		assertEquals(actualStatus,expectedStatus);
+		assertEquals(actualStatus,NO_SUCH_NEWS);
 	}
-	
+
 	@Test
-	public void changeBookSuccessTest(){
-		Book newBook = new Book("New Book", "H.G. Wells", "Fantasy",8);
-		Book oldBook = (Book) SERVICE.getBookById(8).getResult().get(0);
-		
-		LibraryWSResponse response = SERVICE.changeBook(oldBook, newBook);
-				
-		Book expectedBook = newBook;
-		Book actualBook = (Book) SERVICE.getBookByName("New Book").getResult().get(0);
-		
-		assertEquals(actualBook,expectedBook);
-		
-		String expectedStatus = "Book changed successfully";
+	public void removeNewsTest(){
+		NewspaperResponse response = newspaperService.deleteNews(1);
+
 		String actualStatus = response.getStatus().getMessage();
-		assertEquals(actualStatus,expectedStatus);
-	}
-	
-	@Test
-	public void changeBookNoSuchBookFailureTest(){
-		Book newBook = new Book("New Book", "H.G. Wells", "Fantasy",10110);
-		Book oldBook = new Book("Some Old Book _______", "H.G. Wells", "Fantasy",123123);
-		LibraryWSResponse response = SERVICE.changeBook(oldBook, newBook);
-				
-		String expectedStatus = "There is no such book";
-		String actualStatus = response.getStatus().getMessage();
-		assertEquals(actualStatus,expectedStatus);
-	}
-	@Test
-	public void changeBookInCorrectBookFailureTest(){
-		Book newBook = new Book("", "", "",10110);
-		Book oldBook = (Book) SERVICE.getBookById(2).getResult().get(0);
-		LibraryWSResponse response = SERVICE.changeBook(oldBook, newBook);
-				
-		String expectedStatus = "There is no correct arguments";
-		String actualStatus = response.getStatus().getMessage();
-		assertEquals(actualStatus,expectedStatus);
+		assertEquals(actualStatus,DELETE);
 	}
 	
 	
 	
-	*/
+
 
 }
