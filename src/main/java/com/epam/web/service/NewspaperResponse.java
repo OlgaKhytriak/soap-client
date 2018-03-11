@@ -1,9 +1,7 @@
 
 package com.epam.web.service;
 
-import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.*;
 
 

@@ -1,9 +1,11 @@
 package com.epam.test;
 
+import static com.epam.web.service.Status.*;
 import static org.testng.Assert.*;
 import java.util.List;
 
 import com.epam.web.service.NewspaperResponse;
+import com.epam.web.service.SingleNews;
 import com.epam.web.service.impl.NewspaperService;
 import com.epam.web.service.impl.NewspaperServiceImplService;
 import org.testng.annotations.Test;
@@ -17,31 +19,28 @@ public class LibraryServiceTest {
 	@Test
 	public void getAllNewsTest(){
 		NewspaperResponse response = SERVICE.getAllNews();
-		List<Object> allBooks = response.getResult();
-		assertNotNull(allBooks);
-		assertEquals(allBooks.size(),10);
-		
-		String expectedStatus = "All news was got successfully";
+		List<Object> allNews = response.getResult();
+
+		assertEquals(allNews.size(),10);
+
 		String actualStatus = response.getStatus().getMessage();
-		assertEquals(actualStatus,expectedStatus);
+		assertEquals(actualStatus,GET_ALL);
 		
 	}
 	
-/*
+
 	@Test
-	public void getBookByIdSuccesTest(){
-		LibraryWSResponse response = SERVICE.getBookById(1);
-		Book expected = new Book("The Sacred Sword", "Scott Mariani", "Action & Adventure",1);
-		Book actual = (Book) response.getResult().get(0);
-		
-		assertNotNull(actual);
-		assertEquals(actual,expected);
-		
-		String expectedStatus = "Get book by id successfully";
+	public void getNewsByIdTest(){
+		NewspaperResponse response = SERVICE.getNewsById(1);
+		SingleNews expectedNews=new SingleNews(1, "Gold-medal", "Sport", "Gold medalist Abramenko carries Ukrainian flag at Winter Olympics 2018 closing ceremony", "https://24tv.ua");
+		SingleNews actualNews = (SingleNews) response.getResult().get(0);
+
+		assertEquals(actualNews,expectedNews);
+
 		String actualStatus = response.getStatus().getMessage();
-		assertEquals(actualStatus,expectedStatus);
+		assertEquals(actualStatus,GET_BY_ID);
 	}
-	
+/*
 	@Test
 	public void getBookByIdFailureTest(){
 		LibraryWSResponse response = SERVICE.getBookById(-1);
