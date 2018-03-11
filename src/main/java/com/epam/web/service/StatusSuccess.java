@@ -7,21 +7,18 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "statusSuccess", propOrder = {
-    "message"
+        "message"
 })
 public class StatusSuccess
-    extends Status
-{
+        extends Status {
 
     protected String message;
 
     /**
      * Gets the value of the message property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getMessage() {
         return message;
@@ -29,11 +26,9 @@ public class StatusSuccess
 
     /**
      * Sets the value of the message property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setMessage(String value) {
         this.message = value;

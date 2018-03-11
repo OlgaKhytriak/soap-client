@@ -8,7 +8,6 @@ import javax.xml.bind.annotation.*;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "newspaperResponse", propOrder = {"status", "result"})
 public class NewspaperResponse {
-    //"http://service.web/"
     @XmlElements({@XmlElement(name = "success", namespace = "http://service.web/", type = StatusSuccess.class),
             @XmlElement(name = "fault", namespace = "http://service.web/", type = StatusFault.class)})
     private Status status;
